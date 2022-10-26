@@ -43,17 +43,17 @@ class process_dataset(object):
 
         if flag == 'train':
             with open(write_path + '.train', 'w') as fw1:
-            with open(write_path + '.dev', 'w') as fw2:
-                fw1.write('click,purchase,' + ','.join(use_columns) + '\n')
-                fw2.write('click,purchase,' + ','.join(use_columns) + '\n')
-                for sample in sample_list:
-                    new_sample = sample[:2]
-                    for value, feat in zip(sample[2:], use_columns):
-                        new_sample.append(str(feat_map[feat].get(value, '0')))
-                    if random.random() >= 0.9:
-                        fw2.write(','.join(new_sample) + '\n')
-                    else:
-                        fw1.write(','.join(new_sample) + '\n')
+                with open(write_path + '.dev', 'w') as fw2:
+                    fw1.write('click,purchase,' + ','.join(use_columns) + '\n')
+                    fw2.write('click,purchase,' + ','.join(use_columns) + '\n')
+                    for sample in sample_list:
+                        new_sample = sample[:2]
+                        for value, feat in zip(sample[2:], use_columns):
+                            new_sample.append(str(feat_map[feat].get(value, '0')))
+                        if random.random() >= 0.9:
+                            fw2.write(','.join(new_sample) + '\n')
+                        else:
+                            fw1.write(','.join(new_sample) + '\n')
         else:
             with open(write_path + '.test', 'w') as fw:
                 fw.write('click,purchase,' + ','.join(use_columns) + '\n')

@@ -2,3 +2,4 @@ data/*
 !data/.gitkeep
 log/*
 !log/.gitkeep
+nohup.out

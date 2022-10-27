@@ -7,7 +7,7 @@ from collections import namedtuple
 
 random.seed(2020)
 np.random.seed(2020)
-logging.getLogger(__name__)
+logger=logging.getLogger(__name__)
 data_path = 'data/sample_skeleton_{}.csv'
 common_feat_path = 'data/common_features_{}.csv'
 write_path = 'data/ctr_cvr'

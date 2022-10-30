@@ -2,19 +2,21 @@ import os
 import torch
 from torch import nn
 import logging
+from sklearn.metrics import roc_auc_score
 
 logger = logging.getLogger(__name__)
 
 
 class ModelProcessor():
 
-    def __init__(self, config, model, data_processor, optimizer, lr_scheduler):
+    def __init__(self, config, model, data_processor, optimizer, lr_scheduler, loss_func):
         super().__init__()
         self.config = config
         self.model = model
         self.data_processor = data_processor
         self.optimizer = optimizer
         self.lr_scheduler = lr_scheduler
+        self.loss_func = loss_func
 
     def process(self):
         logger.info('train model...')
@@ -56,7 +58,7 @@ class ModelProcessor():
                 if global_step % self.config.logging_steps == 0:
                     logger.info(f'Training: Epoch {epoch+1}/{self.config.epochs} - Step {step + 1} - Loss {loss}')
                 if global_step % self.config.eval_steps == 0:
-                    loss, metric = self._evaluate_model(flag)
+                    loss, metric = self._evaluate_model('dev')
                     logger.info(f'Evaluate: Epoch {epoch+1}/{self.config.epochs} - GlobalStep {global_step + 1} - Loss {loss} - Metric {metric}')
                     if metric > best_metric:
                         best_metric, best_step = metric, global_step
@@ -65,18 +67,33 @@ class ModelProcessor():
         return best_step, best_metric
 
     def _evaluate_model(self, flag):
+        self.model.eval()
+        dataloader = self.data_processor.process(flag)
 
+        loss_list = []
+        preds_list = []
+        labels_list = []
+        for features, labels in dataloader:
+            features, labels = self._prepare_input(features, self.config.device), self._prepare_input(labels, self.config.device)
+            with torch.no_grad():
+                outputs = self.model(features)
+                loss = self.loss_func(outputs, labels)
+                
+                loss_list.append(loss.detach.cpu().item())
+                preds_list.append([x.cpu().numpy().tolist() for x in outputs])
+                labels_list.append([x.cpu().numpy().tolist() for x in labels])
+        loss = np.mean(loss_list)
+        aucs = self._cal_auc(preds_list, labels_list)
 
+        return loss, aucs
 
-
-
-
-
-
-
-
-
-
+    def _cal_auc(self, preds, labels):
+        aucs = []
+        for pred, label in zip(zip(*preds), zip(*labels)):
+            pred, label = np.arrays(pred), np.arrays(label)
+            auc = roc_auc_score(label, pred)
+            aucs.append(auc)
+        return aucs
 
     def _prepare_input(self, data, device='cuda'):
         if isinstance(data, Mapping):

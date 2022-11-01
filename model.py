@@ -38,6 +38,10 @@ class Attention(nn.Module):
         q = self.q_layer(x)
         k = self.k_layer(x)
         v = self.v_layer(x)
+        atten = torch.sum(torch.mul(q, k), -1) / torch.sqrt(torch.tensor(self.dim))
+        atten = self.softmax(atten)
+        outputs = torch.sum(torch.mul(torch.unsqueeze(a, -1), v), dim=1)
+        return outputs
 
 
 class AITM(nn.Module):
@@ -62,7 +66,7 @@ class AITM(nn.Module):
                                         nn.Dropout(drop_probs[-1]))
         self.click_layer = nn.Sequential(nn.Linear(tower_dims[-1], 1),
                                          nn.Sigmoid())
-        self.info_layer = nn.Sequential(nn.Linear(tower_dims[-1], 1), 
+        self.conversion_layer = nn.Sequential(nn.Linear(tower_dims[-1], 1), 
                                         nn.Sigmoid())
        
     def _init_embedding_dict(self):
@@ -76,6 +80,18 @@ class AITM(nn.Module):
         feature_embedding = []
         for name in self.feature_names:
             embed = self.embedding_dict[name](x[name])
+            feature_embedding.append(embed)
+        feature_embedding = torch.cat(feature_embedding, 1)
+        
+        tower_click = self.click_tower(feature_embedding)
+        tower_conversion = self.tower_conversion(feature_embedding)
+        info = self.info_layer(tower_click)
+        ait = self.atten_layer(torch.stack([tower_conversion, info], 1))
+
+        click = torch.squeeze(self.click_layer(tower_click), dim=1)
+        conversion = torch.squeeze(self.conversion_layer(ait), dim=1)
+
+        return click, conversion
 
 
 

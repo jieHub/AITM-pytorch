@@ -33,3 +33,20 @@ def optimizer_and_scheduler(config, model):
     scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=3, T_mult=2, eta_min=1e-5)
     return optimizer, scheduler
      
+
+def get_vocabulary_size(file_path):
+    with open(file_path, 'r') as f:
+        vocab_key = [key for key in f.readline().strip().split(',')]
+        vocab_size = [0] * len(vocab_key)
+        for idx, line in enumerate(f):
+            if idx % 5000000 == 0: print(idx)
+            values = line.strip().split(',')
+            vocab_size = [max(vocab_size[i], int(values[i])) for i in range(len(values))]
+        vocab_size = [x+1 for x in vocab_size]
+    return dict(zip(vocab_key, vocab_size))
+
+
+if __name__ == '__main__':
+    dic = get_vocabulary_size('./data/ctr_cvr.train')
+    print(dic)
+

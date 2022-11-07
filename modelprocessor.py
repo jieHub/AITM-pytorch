@@ -23,13 +23,13 @@ class ModelProcessor():
         self._train_model('train')
         logger.info('evaluate test set...')
         self.model.load_state_dict(torch.load(self.save_path, map_location=self.config.device))
-        loss, metric = self._evaluate_model()
+        loss, metric = self._evaluate_model('test')
         logger.info(f'Evaluate Testset: Loss {loss} - Metric {metric}')
         self.save_path = os.path.join(self.config.output_dir, f'checkpoint-best.pt')
         torch.save(self.model.state_dict(), self.save_path)
         logger.info(f'train model end; best model save in {self.save_path}')
 
-    def _train_model(self, flag):
+    def _train_model(self, flag='train'):
         train_dataloader = self.data_processor.process(flag)
         num_update_steps_per_epoch = max(len(train_dataloader), 1)
 

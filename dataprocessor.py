@@ -22,20 +22,24 @@ calss SampleDataset(Dataset):
         return sample_data, sample_label
 
 
-calss DataProcessor:
+class DataProcessor:
 
     def __init__(self, config):
         super().__init__()
         self.config = config
+        self.cache = dict()
 
     def process(self, flag):
         assert flag in ('train', 'test', 'dev'), 'flag need in ("train", "test", "dev")'
+        if flag in self.cache: return self.cache[flag]
         datafile = self.config.data_path + '.' + flag
 
         logger.info('start _load_data in {}'.format(datafile))
         sample_datas, sample_labels = self._load_data(datafile)
         sample_dataset = SampleDataset(sample_datas, sample_labels)
         sample_dataloader = DataLoader(sample_dataset, batch_size=self.config.batch_size, shuffle=self.config.shuffle if flag != 'test' else False)
+
+        self.cache[flag] = sample_dataloader
         
         return sample_dataloader
 

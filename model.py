@@ -26,7 +26,7 @@ class Tower(nn.Module):
 
 class Attention(nn.Module):
 
-    def __int__(self, dim=32):
+    def __init__(self, dim=32):
         super().__init__()
         self.dim = dim
         self.q_layer = nn.Linear(dim, dim, bias=False)
@@ -72,7 +72,7 @@ class AITM(nn.Module):
     def _init_embedding_dict(self):
         self.embedding_dict = nn.ModuleDict()
         for name, dim in self.feature_vocabulary.items():
-            emb = nn.Embedding(size, self.embedding_size)
+            emb = nn.Embedding(dim, self.embedding_size)
             nn.init.normal_(emb.weight, mean=0.0, std=0.01)
             self.embedding_dict[name] = emb
 
@@ -94,4 +94,6 @@ class AITM(nn.Module):
         return click, conversion
 
 
+if __name__ == '__main__':
+    atten_layer = Attention(32)
 

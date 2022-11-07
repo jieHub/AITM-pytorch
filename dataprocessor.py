@@ -1,12 +1,12 @@
 import logging
-import torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader, Dataset
 from typing import List, Union, Dict, Any, Mapping, Optional
 import torch
 
 logger = logging.getLogger(__name__)
 
 
-calss SampleDataset(Dataset):
+class SampleDataset(Dataset):
 
     def __init__(self, sample_datas, sample_labels=None):
         super().__init__()
@@ -49,7 +49,7 @@ class DataProcessor:
         with open(datafile, 'r') as f:
             feature_name = f.readline().strip().split(',')[2:]
             for i, line in enumerate(f):
-                datas = [torch.tensor(x, dtype=torch.long) for x in line.strip().split(',')]
+                datas = [torch.tensor(int(x), dtype=torch.long) for x in line.strip().split(',')]
                 sample_datas.append(dict(zip(feature_name, datas[2:])))
                 sample_labels.append(datas[:2])
         logger.info('file {} line num {}; data: {} label: {}'.format(datafile, i, sample_datas[0], sample_labels[0]))

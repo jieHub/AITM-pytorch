@@ -3,6 +3,7 @@ import torch
 from torch import nn
 import logging
 from sklearn.metrics import roc_auc_score
+from typing import List, Tuple, Mapping, Dict
 
 logger = logging.getLogger(__name__)
 
@@ -39,9 +40,8 @@ class ModelProcessor():
         best_metric, best_step = 0, -1
         global_step = 0
         logger.info('******start training model ...******')
-        logger.inof(f'   Num sample = {num_sample}')
         logger.info(f'   Num epochs = {self.config.epochs}')
-        logger.info(f'   Batch size = {self.config.batchsize}')
+        logger.info(f'   Batch size = {self.config.batch_size}')
 
         for epoch in range(self.config.epochs):
             for step, (features, labels) in enumerate(train_dataloader):

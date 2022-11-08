@@ -18,8 +18,9 @@ def random_seed(seed=0):
 def loss_func(preds, labels, constraint_weight=0.6):
     click_preds, conversion_preds = preds
 
-    click_loss = nn.functional.binary_cross_entropy(click_preds, labels[:, 0])
-    conversion_loss = nn.functional.binary_cross_entropy(conversion_preds, labels[:, 1])
+    labels = [x.to(dtype=torch.float) for x in labels]
+    click_loss = nn.functional.binary_cross_entropy(click_preds, labels[0])
+    conversion_loss = nn.functional.binary_cross_entropy(conversion_preds, labels[1])
     constraint_loss = torch.sum(torch.maximum(conversion_preds - click_preds, torch.zeros_like(click_preds)))
 
     loss = click_loss + conversion_loss + constraint_weight * constraint_loss

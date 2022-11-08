@@ -40,7 +40,7 @@ class Attention(nn.Module):
         v = self.v_layer(x)
         atten = torch.sum(torch.mul(q, k), -1) / torch.sqrt(torch.tensor(self.dim))
         atten = self.softmax(atten)
-        outputs = torch.sum(torch.mul(torch.unsqueeze(a, -1), v), dim=1)
+        outputs = torch.sum(torch.mul(torch.unsqueeze(atten, -1), v), dim=1)
         return outputs
 
 
@@ -84,7 +84,7 @@ class AITM(nn.Module):
         feature_embedding = torch.cat(feature_embedding, 1)
         
         tower_click = self.click_tower(feature_embedding)
-        tower_conversion = self.tower_conversion(feature_embedding)
+        tower_conversion = self.conversion_tower(feature_embedding)
         info = self.info_layer(tower_click)
         ait = self.atten_layer(torch.stack([tower_conversion, info], 1))
 

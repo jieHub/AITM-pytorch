@@ -18,13 +18,15 @@ class Config:
     batch_size: int = field(default=2000)
     embedding_size: int  = field(default=5)
     learning_rate: float = field(default=1e-4)
-    total_epoch: int = field(default=10)
+    epochs: int = field(default=10)
     earlystop_epoch: int = field(default=1)
     model_file: str = field(default='./out/AITM.model')
     vocab_dict: Mapping = field(default_factory= lambda : {'101': 238635, '121': 98, '122': 14, '124': 3, '125': 8, '126': 4, '127': 4, '128': 3, '129': 5, '205': 467298, '206': 6929, '207': 263942, '216': 106399, '508': 5888, '509': 104830, '702': 51878, '853': 37148, '301': 4})
     device: str = field(default='cuda' if torch.cuda.is_available() else 'cpu')
     weight_decay: float = field(default=1e-6)
     data_path: str = field(default='./data/ctr_cvr')
+    shuffle: bool = field(default=True)
+    logging_steps: int = field(default=100)
 
     def __repr__(self):
         self_asdict = dataclasses.asdict(self)

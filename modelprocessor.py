@@ -4,6 +4,7 @@ from torch import nn
 import logging
 from sklearn.metrics import roc_auc_score
 from typing import List, Tuple, Mapping, Dict
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -79,21 +80,21 @@ class ModelProcessor():
                 outputs = self.model(features)
                 loss = self.loss_func(outputs, labels)
                 
-                loss_list.append(loss.detach.cpu().item())
-                preds_list.append([x.cpu().numpy().tolist() for x in outputs])
-                labels_list.append([x.cpu().numpy().tolist() for x in labels])
+                loss_list.append(loss.detach().cpu().item())
+                preds_list.append(np.stack([x.cpu().numpy() for x in outputs], axis=1))
+                labels_list.append(np.stack([x.cpu().numpy() for x in labels], axis=1))
         loss = np.mean(loss_list)
-        aucs = self._cal_auc(preds_list, labels_list)
+        preds, labels = np.concatenate(preds_list, axis=0), np.concatenate(labels_list, axis=0)
+        aucs = self._cal_auc(preds, labels)
 
         return loss, aucs
 
     def _cal_auc(self, preds, labels):
         aucs = []
-        for pred, label in zip(zip(*preds), zip(*labels)):
-            pred, label = np.arrays(pred), np.arrays(label)
-            auc = roc_auc_score(label, pred)
+        for i in range(preds.shape[-1]):
+            auc = roc_auc_score(labels[:, i], preds[:, i])
             aucs.append(auc)
-        return aucs
+        return np.mean(aucs)
 
     def _prepare_input(self, data, device='cuda'):
         if isinstance(data, Mapping):

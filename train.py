@@ -26,7 +26,9 @@ class Config:
     weight_decay: float = field(default=1e-6)
     data_path: str = field(default='./data/ctr_cvr')
     shuffle: bool = field(default=True)
-    logging_steps: int = field(default=100)
+    logging_steps: int = field(default=1000)
+    eval_steps: int = field(default=2000)
+    output_dir: str = field(default='./output')
 
     def __repr__(self):
         self_asdict = dataclasses.asdict(self)

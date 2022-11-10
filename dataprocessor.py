@@ -49,8 +49,10 @@ class DataProcessor:
         with open(datafile, 'r') as f:
             feature_name = f.readline().strip().split(',')[2:]
             for i, line in enumerate(f):
-                datas = [torch.tensor(int(x), dtype=torch.long) for x in line.strip().split(',')]
+                datas = [int(x) for x in line.strip().split(',')]
                 sample_datas.append(dict(zip(feature_name, datas[2:])))
                 sample_labels.append(datas[:2])
+                if i % 1000000 == 0:
+                    logger.info('loading file {} line num {}'.format(datafile, i))
         logger.info('file {} line num {}; data: {} label: {}'.format(datafile, i, sample_datas[0], sample_labels[0]))
         return sample_datas, sample_labels

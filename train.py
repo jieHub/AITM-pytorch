@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class Config:
-    batch_size: int = field(default=2000)
+    batch_size: int = field(default=1000)
     embedding_size: int  = field(default=5)
     learning_rate: float = field(default=1e-4)
     epochs: int = field(default=10)

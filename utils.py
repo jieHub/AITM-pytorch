@@ -32,7 +32,7 @@ def optimizer_and_scheduler(config, model):
             lr=config.learning_rate,
             weight_decay=config.weight_decay)
     
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=3, T_mult=2, eta_min=1e-5)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=1, T_mult=2, eta_min=1e-3)
     return optimizer, scheduler
      
 

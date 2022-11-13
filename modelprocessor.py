@@ -61,6 +61,7 @@ class ModelProcessor():
                 if global_step % self.config.eval_steps == 0:
                     loss, metric = self._evaluate_model('dev')
                     logger.info(f'Evaluate: Epoch {epoch+1}/{self.config.epochs} - GlobalStep {global_step + 1} - Loss {loss} - Metric {metric}')
+                    metric = np.mean(metric)
                     if metric > best_metric:
                         best_metric, best_step = metric, global_step
                         self.save_path = os.path.join(self.config.output_dir, f'checkpoint-{best_step}.pt')
@@ -75,6 +76,7 @@ class ModelProcessor():
         preds_list = []
         labels_list = []
         for features, labels in dataloader:
+            torch.cuda.empty_cache()
             features, labels = self._prepare_input(features, self.config.device), self._prepare_input(labels, self.config.device)
             with torch.no_grad():
                 outputs = self.model(features)
@@ -94,7 +96,7 @@ class ModelProcessor():
         for i in range(preds.shape[-1]):
             auc = roc_auc_score(labels[:, i], preds[:, i])
             aucs.append(auc)
-        return np.mean(aucs)
+        return aucs
 
     def _prepare_input(self, data, device='cuda'):
         if isinstance(data, Mapping):

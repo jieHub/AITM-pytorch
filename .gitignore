@@ -3,5 +3,5 @@ data/*
 log/*
 !log/.gitkeep
 nohup.out
-__pycache__
+__pycache__/*
 output/*
